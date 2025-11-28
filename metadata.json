@@ -1,0 +1,5 @@
+{
+  "name": "ChronoVisor: Time Travel Explorer",
+  "description": "A temporal exploration interface using Gemini to visualize any place at any time in history or the future.",
+  "requestFramePermissions": []
+}
