@@ -124,10 +124,10 @@ const drawComposition = (ctx: CanvasRenderingContext2D, img: HTMLImageElement | 
     ctx.fillText(formatTime(result.time), pad, textStart + 120);
 
     // Description (Wrap text)
-    ctx.font = '30px "Courier New", monospace';
     ctx.fillStyle = '#cbd5e1'; // Slate 300
     const maxTextWidth = width - (pad * 2) - 300; // Leave room for logo
-    wrapText(ctx, result.description, pad, textStart + 180, maxTextWidth, 40);
+    const maxTextHeight = bottomBarHeight - 190; // Height available for description
+    wrapText(ctx, result.description, pad, textStart + 180, maxTextWidth, 40, maxTextHeight);
 
     // 6. Branding / Logo area (Bottom Right)
     const logoSize = 100;
@@ -148,22 +148,44 @@ const drawComposition = (ctx: CanvasRenderingContext2D, img: HTMLImageElement | 
     ctx.fillText("OFFICIAL RECORD", logoX + 100, logoY + 75);
 };
 
-// Helper to wrap text
-function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) {
-    const words = text.split(' ');
-    let line = '';
+// Helper to wrap text with vertical overflow protection
+function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number, maxHeight: number) {
+    let fontSize = 30; // Start with default font size
+    ctx.font = `${fontSize}px "Courier New", monospace`;
 
-    for(let n = 0; n < words.length; n++) {
-      const testLine = line + words[n] + ' ';
-      const metrics = ctx.measureText(testLine);
-      const testWidth = metrics.width;
-      if (testWidth > maxWidth && n > 0) {
-        ctx.fillText(line, x, y);
-        line = words[n] + ' ';
-        y += lineHeight;
-      } else {
-        line = testLine;
-      }
+    const words = text.split(' ');
+    let lines: string[] = [];
+
+    // Iterative function to calculate lines based on current font size
+    const calculateLines = () => {
+        lines = [];
+        let line = '';
+        for (let n = 0; n < words.length; n++) {
+            const testLine = line + words[n] + ' ';
+            const metrics = ctx.measureText(testLine);
+            const testWidth = metrics.width;
+            if (testWidth > maxWidth && n > 0) {
+                lines.push(line);
+                line = words[n] + ' ';
+            } else {
+                line = testLine;
+            }
+        }
+        lines.push(line);
+    };
+
+    calculateLines();
+
+    // Reduce font size if text exceeds vertical space
+    while ((lines.length * lineHeight) > maxHeight && fontSize > 14) {
+        fontSize -= 2;
+        lineHeight = Math.floor(fontSize * 1.33); // Adjust line height proportionally
+        ctx.font = `${fontSize}px "Courier New", monospace`;
+        calculateLines();
     }
-    ctx.fillText(line, x, y);
+
+    // Draw the lines
+    for (let i = 0; i < lines.length; i++) {
+         ctx.fillText(lines[i], x, y + (i * lineHeight));
+    }
 }
