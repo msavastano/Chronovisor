@@ -91,12 +91,25 @@ const drawComposition = (ctx: CanvasRenderingContext2D, img: HTMLImageElement | 
     const textStart = bottomY + pad;
 
     // Location Title
-    ctx.font = 'bold 80px "Courier New", monospace';
+    let fontSize = 80;
+    ctx.font = `bold ${fontSize}px "Courier New", monospace`;
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(6, 182, 212, 0.5)';
     ctx.shadowBlur = 10;
     ctx.textAlign = 'left';
-    ctx.fillText(result.locationName.toUpperCase(), pad, textStart + 40);
+    
+    const titleText = result.locationName.toUpperCase();
+    const maxTitleWidth = width - (pad * 2) - 300; // Avoid overlapping with logo area
+
+    // Scale down font if too wide
+    let textMetrics = ctx.measureText(titleText);
+    while (textMetrics.width > maxTitleWidth && fontSize > 20) {
+        fontSize -= 2;
+        ctx.font = `bold ${fontSize}px "Courier New", monospace`;
+        textMetrics = ctx.measureText(titleText);
+    }
+
+    ctx.fillText(titleText, pad, textStart + 40);
     ctx.shadowBlur = 0; // Reset shadow
 
     // Date & Time
