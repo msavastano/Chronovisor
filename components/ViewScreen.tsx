@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TravelResult } from '../types';
+import { generateSouvenir } from '../utils/souvenirGenerator';
 
 interface ViewScreenProps {
   result: TravelResult | null;
@@ -7,11 +8,34 @@ interface ViewScreenProps {
 }
 
 const ViewScreen: React.FC<ViewScreenProps> = ({ result, loading }) => {
+  const [isGenerating, setIsGenerating] = useState(false);
+
   // Helper to format date
   const formatTime = (t: any) => {
       const pad = (n: number) => n.toString().padStart(2, '0');
       const yearStr = t.year <= 0 ? `${Math.abs(t.year)} BC` : `AD ${t.year}`;
       return `${yearStr} • ${pad(t.month)}/${pad(t.day)} • ${pad(t.hour)}:${pad(t.minute)}:${pad(t.second)}`;
+  };
+
+  const handleDownloadSouvenir = async () => {
+    if (!result) return;
+    setIsGenerating(true);
+    try {
+      const dataUrl = await generateSouvenir(result);
+      
+      // Trigger download
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `Chronovisor-${result.locationName.replace(/\s+/g, '_')}-${result.time.year}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Failed to generate souvenir", error);
+      alert("Error generating souvenir sequence.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -65,6 +89,24 @@ const ViewScreen: React.FC<ViewScreenProps> = ({ result, loading }) => {
             {/* Scanlines Overlay */}
             <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] z-10"></div>
             
+            {/* Souvenir Button (Absolute Positioned) */}
+            <button 
+              onClick={handleDownloadSouvenir}
+              disabled={isGenerating}
+              className="absolute top-16 right-4 z-40 bg-black/60 border border-cyan-500 text-cyan-400 text-xs px-3 py-1 hover:bg-cyan-900/50 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-2"
+            >
+              {isGenerating ? (
+                <>Processing...</>
+              ) : (
+                <>
+                  <span>Download Souvenir</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                </>
+              )}
+            </button>
+
             {/* Description Overlay (Bottom) */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-6 pt-12 z-20">
               <div className="flex items-baseline justify-between mb-2">
