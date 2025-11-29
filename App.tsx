@@ -8,7 +8,8 @@ import { executeTimeTravel, checkAndRequestApiKey, lookupHistoricalEvent } from 
 
 function App() {
   const [selectedCoordinates, setSelectedCoordinates] = useState<Coordinates | null>(null);
-  
+  const [isMockMode, setIsMockMode] = useState<boolean>(false);
+
   // Default to current date/time
   const now = new Date();
   const [timeParams, setTimeParams] = useState<TimeParams>({
@@ -33,7 +34,7 @@ function App() {
   const handleEventLookup = async (query: string) => {
     setError(null);
     try {
-      const data = await lookupHistoricalEvent(query);
+      const data = await lookupHistoricalEvent(query, isMockMode);
       if (data) {
         setSelectedCoordinates(data.coordinates);
         setTimeParams(data.time);
@@ -52,16 +53,19 @@ function App() {
     setError(null);
 
     try {
-      // Pre-flight check for key
-      const hasKey = await checkAndRequestApiKey();
-      if (!hasKey) {
-        throw new Error("API Key selection is required for Temporal Displacement.");
+      if (!isMockMode) {
+          // Pre-flight check for key only if not mocking
+          const hasKey = await checkAndRequestApiKey();
+          if (!hasKey) {
+            throw new Error("API Key selection is required for Temporal Displacement.");
+          }
       }
 
       const travelResult = await executeTimeTravel(
         selectedCoordinates.lat,
         selectedCoordinates.lng,
-        timeParams
+        timeParams,
+        isMockMode
       );
       setResult(travelResult);
     } catch (err: any) {
@@ -120,6 +124,8 @@ function App() {
                onTravel={handleTravel}
                onEventLookup={handleEventLookup}
                isTraveling={isTraveling}
+               isMockMode={isMockMode}
+               onToggleMockMode={() => setIsMockMode(!isMockMode)}
              />
           </div>
         </div>
@@ -135,12 +141,14 @@ function App() {
                <div>
                  <div className="font-bold">CRITICAL ERROR</div>
                  <div>{error}</div>
-                 <button 
-                    onClick={() => window.aistudio?.openSelectKey()} 
-                    className="mt-2 text-xs underline hover:text-white"
-                  >
-                    RESET SECURITY CREDENTIALS (API KEY)
-                 </button>
+                 {!isMockMode && (
+                     <button 
+                        onClick={() => window.aistudio?.openSelectKey()} 
+                        className="mt-2 text-xs underline hover:text-white"
+                      >
+                        RESET SECURITY CREDENTIALS (API KEY)
+                     </button>
+                 )}
                </div>
              </div>
            )}

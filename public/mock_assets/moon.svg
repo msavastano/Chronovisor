@@ -1,0 +1,6 @@
+<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#0b0c10"/>
+  <circle cx="512" cy="512" r="400" fill="#c5c6c7"/>
+  <text x="512" y="512" font-family="monospace" font-size="60" text-anchor="middle" fill="#1f2833">LUNAR SURFACE</text>
+  <text x="512" y="600" font-family="monospace" font-size="40" text-anchor="middle" fill="#45a29e">(MOCK VISUALIZATION)</text>
+</svg>

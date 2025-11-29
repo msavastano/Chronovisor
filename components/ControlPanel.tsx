@@ -11,6 +11,8 @@ interface ControlPanelProps {
   onTravel: () => void;
   onEventLookup: (query: string) => Promise<void>;
   isTraveling: boolean;
+  isMockMode: boolean;
+  onToggleMockMode: () => void;
 }
 
 const ControlPanel: React.FC<ControlPanelProps> = ({
@@ -21,7 +23,9 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   onRandomize,
   onTravel,
   onEventLookup,
-  isTraveling
+  isTraveling,
+  isMockMode,
+  onToggleMockMode
 }) => {
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,6 +94,22 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   return (
     <div className="flex flex-col gap-5 p-6 bg-slate-900/80 tech-border backdrop-blur-sm h-full justify-center">
       
+      {/* Mock Mode Toggle */}
+      <div className="flex items-center justify-between border-b border-cyan-900/30 pb-2">
+          <span className="text-cyan-400 text-xs font-bold tracking-widest uppercase">System Mode</span>
+          <button 
+             onClick={onToggleMockMode}
+             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isMockMode ? 'bg-green-600' : 'bg-slate-700'}`}
+          >
+             <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isMockMode ? 'translate-x-5' : 'translate-x-1'}`} />
+          </button>
+      </div>
+      <div className="text-right -mt-3">
+         <span className={`text-[9px] uppercase tracking-wider ${isMockMode ? 'text-green-400' : 'text-slate-500'}`}>
+            {isMockMode ? 'Simulated (Offline)' : 'Live (Online)'}
+         </span>
+      </div>
+
       {/* Search Module */}
       <div className="space-y-2 pb-4 border-b border-cyan-900/30">
         <label className="text-cyan-400 text-xs font-bold tracking-widest uppercase flex justify-between">

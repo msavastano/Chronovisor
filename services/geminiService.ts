@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { TravelResult, TimeParams, Coordinates } from "../types";
+import { getRandomMockResult } from "../src/mocks/data";
 
 // Helper to check and prompt for key
 export const checkAndRequestApiKey = async (): Promise<boolean> => {
@@ -20,7 +21,28 @@ export const checkAndRequestApiKey = async (): Promise<boolean> => {
   return !!process.env.API_KEY;
 };
 
-export const lookupHistoricalEvent = async (query: string): Promise<{ coordinates: Coordinates, time: TimeParams, title: string } | null> => {
+export const lookupHistoricalEvent = async (query: string, useMock: boolean = false): Promise<{ coordinates: Coordinates, time: TimeParams, title: string } | null> => {
+  if (useMock) {
+    // Return a random mock result converted to event format
+    const mock = getRandomMockResult();
+    // Mock specific coordinates for the mock scenarios
+    let coords = { lat: 41.8925, lng: 12.4853 }; // Default Rome
+    if (mock.locationName.includes("Tokyo")) coords = { lat: 35.6762, lng: 139.6503 };
+    if (mock.locationName.includes("Cretaceous")) coords = { lat: 40.0, lng: -100.0 };
+    if (mock.locationName.includes("Moon")) coords = { lat: 0.674, lng: 23.4729 };
+    if (mock.locationName.includes("Stirling")) coords = { lat: 56.1229, lng: -3.9446 };
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({
+                title: mock.locationName,
+                coordinates: coords,
+                time: mock.time
+            });
+        }, 1000); // Fake delay
+    });
+  }
+
   await checkAndRequestApiKey();
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -91,8 +113,17 @@ export const lookupHistoricalEvent = async (query: string): Promise<{ coordinate
 export const executeTimeTravel = async (
   lat: number,
   lng: number,
-  time: TimeParams
+  time: TimeParams,
+  useMock: boolean = false
 ): Promise<TravelResult> => {
+  if (useMock) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(getRandomMockResult());
+        }, 2000); // Fake processing time
+    });
+  }
+
   // Ensure we have a key
   await checkAndRequestApiKey();
 
