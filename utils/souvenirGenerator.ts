@@ -79,7 +79,7 @@ const drawComposition = (ctx: CanvasRenderingContext2D, img: HTMLImageElement | 
   const bottomY = height - bottomBarHeight;
 
   // Glass effect background
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
   ctx.fillRect(0, bottomY, width, bottomBarHeight);
 
   // Top border of the bar
