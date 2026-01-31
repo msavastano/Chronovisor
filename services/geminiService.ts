@@ -61,7 +61,7 @@ export const lookupHistoricalEvent = async (query: string, useMock: boolean = fa
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-3-flash-preview',
       contents: userPrompt,
       config: {
         systemInstruction: systemInstruction,
@@ -161,7 +161,7 @@ export const executeTimeTravel = async (
   `;
 
   const textResponse = await ai.models.generateContent({
-    model: 'gemini-3-pro-preview',
+    model: 'gemini-3-flash-preview',
     contents: userPrompt,
     config: {
       systemInstruction: systemInstruction,
