@@ -5,9 +5,11 @@ import { generateSouvenir } from '../utils/souvenirGenerator';
 interface ViewScreenProps {
   result: TravelResult | null;
   loading: boolean;
+  error?: string | null;
+  onDismissError?: () => void;
 }
 
-const ViewScreen: React.FC<ViewScreenProps> = ({ result, loading }) => {
+const ViewScreen: React.FC<ViewScreenProps> = ({ result, loading, error, onDismissError }) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Helper to format date
@@ -63,7 +65,56 @@ const ViewScreen: React.FC<ViewScreenProps> = ({ result, loading }) => {
           </div>
         )}
 
-        {!loading && !result && (
+        {!loading && error && (
+          <div className="absolute inset-0 z-30 bg-black flex flex-col items-center justify-center p-8 overflow-hidden">
+            {/* Glitch background lines */}
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute top-[15%] left-0 right-0 h-px bg-red-500 animate-pulse"></div>
+              <div className="absolute top-[35%] left-0 right-0 h-0.5 bg-red-600/50" style={{animation: 'pulse 1.5s ease-in-out infinite'}}></div>
+              <div className="absolute top-[62%] left-0 right-0 h-px bg-red-500/40 animate-pulse"></div>
+              <div className="absolute top-[78%] left-0 right-0 h-0.5 bg-red-600/30" style={{animation: 'pulse 2s ease-in-out infinite'}}></div>
+            </div>
+
+            {/* Static noise overlay */}
+            <div className="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20256%20256%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cfilter%20id%3D%22noise%22%3E%3CfeTurbulence%20baseFrequency%3D%220.9%22%20type%3D%22fractalNoise%22%20numOctaves%3D%224%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23noise)%22%2F%3E%3C%2Fsvg%3E')]"></div>
+
+            {/* Scanlines */}
+            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.3)_50%)] bg-[length:100%_2px] z-10"></div>
+
+            {/* Error content */}
+            <div className="relative z-20 text-center space-y-6 max-w-lg">
+              {/* Glitchy warning symbol */}
+              <div className="relative inline-block">
+                <div className="text-7xl text-red-500 animate-pulse font-mono" style={{textShadow: '2px 0 #ff0000, -2px 0 #00ffff'}}>⚠</div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="text-red-500 font-mono text-xs tracking-[0.5em] uppercase animate-pulse">
+                  // SYSTEM MALFUNCTION //
+                </div>
+                <div className="text-red-400 font-mono text-lg font-bold tracking-wider" style={{textShadow: '0 0 10px rgba(239,68,68,0.5)'}}>
+                  TEMPORAL DISPLACEMENT FAILED
+                </div>
+              </div>
+
+              <div className="bg-red-950/30 border border-red-900/50 p-4 text-left">
+                <div className="text-red-500/70 font-mono text-[10px] uppercase tracking-widest mb-2">Error Log {'>'} Diagnostics</div>
+                <div className="text-red-300 font-mono text-sm leading-relaxed">
+                  {error}
+                </div>
+              </div>
+
+              <button
+                onClick={onDismissError}
+                className="bg-red-950/50 hover:bg-red-900/50 border border-red-800/50 hover:border-red-600 text-red-400 hover:text-red-300 px-6 py-2 font-mono text-xs uppercase tracking-widest transition-all"
+              >
+                Acknowledge &amp; Reset
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && !result && (
           <div className="text-center space-y-4 opacity-50">
             <div className="text-6xl text-cyan-900">∅</div>
             <div className="text-cyan-700 font-mono text-sm">NO TEMPORAL DATA LOADED</div>
@@ -71,7 +122,7 @@ const ViewScreen: React.FC<ViewScreenProps> = ({ result, loading }) => {
           </div>
         )}
 
-        {!loading && result && (
+        {!loading && !error && result && (
           <div className="w-full h-full relative group">
             {/* Main Image */}
             {result.imageUrl ? (

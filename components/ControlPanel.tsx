@@ -13,6 +13,8 @@ interface ControlPanelProps {
   isTraveling: boolean;
   isMockMode: boolean;
   onToggleMockMode: () => void;
+  apiKey: string;
+  onSetApiKey: (key: string) => void;
 }
 
 const ControlPanel: React.FC<ControlPanelProps> = ({
@@ -25,11 +27,17 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   onEventLookup,
   isTraveling,
   isMockMode,
-  onToggleMockMode
+  onToggleMockMode,
+  apiKey,
+  onSetApiKey
 }) => {
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState(apiKey);
+
+  const hasApiKey = apiKey.trim().length > 0;
 
   const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTimeParams({ ...timeParams, year: Number(e.target.value) });
@@ -94,20 +102,63 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   return (
     <div className="flex flex-col gap-5 p-6 bg-slate-900/80 tech-border backdrop-blur-sm h-full justify-center">
       
-      {/* Mock Mode Toggle */}
-      <div className="flex items-center justify-between border-b border-cyan-900/30 pb-2">
+      {/* API Key & Mode Controls */}
+      <div className="space-y-2 border-b border-cyan-900/30 pb-3">
+        <div className="flex items-center justify-between">
           <span className="text-cyan-400 text-xs font-bold tracking-widest uppercase">System Mode</span>
-          <button 
-             onClick={onToggleMockMode}
-             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isMockMode ? 'bg-green-600' : 'bg-slate-700'}`}
+          <button
+             onClick={() => { if (hasApiKey) onToggleMockMode(); }}
+             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${
+               !hasApiKey ? 'bg-slate-800 cursor-not-allowed opacity-50' :
+               isMockMode ? 'bg-green-600' : 'bg-slate-700'
+             }`}
+             title={!hasApiKey ? 'Enter API key to enable live mode' : ''}
           >
              <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isMockMode ? 'translate-x-5' : 'translate-x-1'}`} />
           </button>
-      </div>
-      <div className="text-right -mt-3">
-         <span className={`text-[9px] uppercase tracking-wider ${isMockMode ? 'text-green-400' : 'text-slate-500'}`}>
-            {isMockMode ? 'Simulated (Offline)' : 'Live (Online)'}
-         </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => setShowApiKey(!showApiKey)}
+            className="text-[9px] uppercase tracking-wider text-cyan-700 hover:text-cyan-400 transition-colors flex items-center gap-1"
+          >
+            <span>{showApiKey ? '▼' : '▶'}</span>
+            <span>{hasApiKey ? 'API KEY CONFIGURED' : 'CONFIGURE API KEY'}</span>
+            {hasApiKey && <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500"></span>}
+          </button>
+          <span className={`text-[9px] uppercase tracking-wider ${isMockMode ? 'text-green-400' : hasApiKey ? 'text-cyan-500' : 'text-slate-600'}`}>
+            {isMockMode ? 'Simulated (Offline)' : hasApiKey ? 'Live (Online)' : 'No Key — Offline'}
+          </span>
+        </div>
+
+        {showApiKey && (
+          <div className="space-y-2 pt-1">
+            <div className="flex gap-2">
+              <input
+                type="password"
+                placeholder="Enter Gemini API Key"
+                value={apiKeyInput}
+                onChange={(e) => setApiKeyInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') onSetApiKey(apiKeyInput); }}
+                className="w-full bg-black/60 border border-cyan-800 text-cyan-200 text-xs p-2 outline-none focus:border-cyan-500 placeholder-cyan-800 font-mono"
+              />
+              <button
+                onClick={() => onSetApiKey(apiKeyInput)}
+                className="bg-cyan-900/50 hover:bg-cyan-800 border border-cyan-700 text-cyan-300 px-3 text-xs transition-colors uppercase tracking-wider whitespace-nowrap"
+              >
+                Link
+              </button>
+            </div>
+            {hasApiKey && (
+              <button
+                onClick={() => { setApiKeyInput(''); onSetApiKey(''); }}
+                className="text-[9px] text-red-500/70 hover:text-red-400 transition-colors uppercase tracking-wider"
+              >
+                Disconnect Key
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Search Module */}

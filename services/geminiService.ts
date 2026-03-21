@@ -2,26 +2,12 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { TravelResult, TimeParams, Coordinates } from "../types";
 import { getRandomMockResult } from "../src/mocks/data";
 
-// Helper to check and prompt for key
-export const checkAndRequestApiKey = async (): Promise<boolean> => {
-  if (window.aistudio && window.aistudio.hasSelectedApiKey) {
-    const hasKey = await window.aistudio.hasSelectedApiKey();
-    if (!hasKey) {
-      try {
-        await window.aistudio.openSelectKey();
-        // Per guidelines: Assume success after openSelectKey to mitigate race condition
-        return true;
-      } catch (e) {
-        console.error("User cancelled or failed to select key", e);
-        return false;
-      }
-    }
-    return true;
-  }
-  return !!process.env.API_KEY;
+// Helper to check for a usable API key
+export const checkApiKey = (apiKey: string): boolean => {
+  return apiKey.trim().length > 0;
 };
 
-export const lookupHistoricalEvent = async (query: string, useMock: boolean = false): Promise<{ coordinates: Coordinates, time: TimeParams, title: string } | null> => {
+export const lookupHistoricalEvent = async (query: string, useMock: boolean = false, apiKey: string = ''): Promise<{ coordinates: Coordinates, time: TimeParams, title: string } | null> => {
   if (useMock) {
     // Return a random mock result converted to event format
     const mock = getRandomMockResult();
@@ -43,8 +29,8 @@ export const lookupHistoricalEvent = async (query: string, useMock: boolean = fa
     });
   }
 
-  await checkAndRequestApiKey();
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  if (!checkApiKey(apiKey)) throw new Error("TEMPORAL LINK SEVERED — No API key configured. Enter your Gemini API key to establish connection.");
+  const ai = new GoogleGenAI({ apiKey });
 
   const systemInstruction = `
     You are a historical temporal database. 
@@ -114,7 +100,8 @@ export const executeTimeTravel = async (
   lat: number,
   lng: number,
   time: TimeParams,
-  useMock: boolean = false
+  useMock: boolean = false,
+  apiKey: string = ''
 ): Promise<TravelResult> => {
   if (useMock) {
     return new Promise((resolve) => {
@@ -125,10 +112,10 @@ export const executeTimeTravel = async (
   }
 
   // Ensure we have a key
-  await checkAndRequestApiKey();
+  if (!checkApiKey(apiKey)) throw new Error("TEMPORAL LINK SEVERED — No API key configured. Enter your Gemini API key to establish connection.");
 
   // Initialize client
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey });
 
   // Step 1: ChronoVisor System Prompt (Using Gemini 3 Pro for high-quality reasoning)
   const systemInstruction = `
@@ -192,7 +179,7 @@ export const executeTimeTravel = async (
 
   // Step 2: Generate Image (Using Nano Banana Pro / Gemini 3 Pro Image Preview)
   
-  const imageAi = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const imageAi = new GoogleGenAI({ apiKey });
   const finalImagePrompt = `
     ${locationData.visualPrompt}
     Cinematic composition, 8k resolution, highly detailed, photorealistic. 
@@ -204,7 +191,7 @@ export const executeTimeTravel = async (
 
   try {
     const imageResponse = await imageAi.models.generateContent({
-      model: 'gemini-3-pro-image-preview',
+      model: 'gemini-3.1-flash-image-preview',
       contents: {
         parts: [{ text: finalImagePrompt }]
       },
