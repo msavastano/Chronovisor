@@ -19,13 +19,13 @@ export const lookupHistoricalEvent = async (query: string, useMock: boolean = fa
     if (mock.locationName.includes("Stirling")) coords = { lat: 56.1229, lng: -3.9446 };
 
     return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                title: mock.locationName,
-                coordinates: coords,
-                time: mock.time
-            });
-        }, 1000); // Fake delay
+      setTimeout(() => {
+        resolve({
+          title: mock.locationName,
+          coordinates: coords,
+          time: mock.time
+        });
+      }, 1000); // Fake delay
     });
   }
 
@@ -47,7 +47,7 @@ export const lookupHistoricalEvent = async (query: string, useMock: boolean = fa
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.1-flash-lite',
       contents: userPrompt,
       config: {
         systemInstruction: systemInstruction,
@@ -71,7 +71,7 @@ export const lookupHistoricalEvent = async (query: string, useMock: boolean = fa
     });
 
     const data = JSON.parse(response.text || "{}");
-    
+
     if (!data.latitude || !data.year) return null;
 
     return {
@@ -105,9 +105,9 @@ export const executeTimeTravel = async (
 ): Promise<TravelResult> => {
   if (useMock) {
     return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(getRandomMockResult());
-        }, 2000); // Fake processing time
+      setTimeout(() => {
+        resolve(getRandomMockResult());
+      }, 2000); // Fake processing time
     });
   }
 
@@ -148,7 +148,7 @@ export const executeTimeTravel = async (
   `;
 
   const textResponse = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-3.1-flash-lite',
     contents: userPrompt,
     config: {
       systemInstruction: systemInstruction,
@@ -167,7 +167,7 @@ export const executeTimeTravel = async (
 
   let locationData;
   try {
-     locationData = JSON.parse(textResponse.text || "{}");
+    locationData = JSON.parse(textResponse.text || "{}");
   } catch (e) {
     console.error("Failed to parse JSON", e);
     locationData = {
@@ -178,7 +178,7 @@ export const executeTimeTravel = async (
   }
 
   // Step 2: Generate Image (Using Nano Banana Pro / Gemini 3 Pro Image Preview)
-  
+
   const imageAi = new GoogleGenAI({ apiKey });
   const finalImagePrompt = `
     ${locationData.visualPrompt}
@@ -191,7 +191,7 @@ export const executeTimeTravel = async (
 
   try {
     const imageResponse = await imageAi.models.generateContent({
-      model: 'gemini-3.1-flash-image-preview',
+      model: 'gemini-3.1-flash-lite-image',
       contents: {
         parts: [{ text: finalImagePrompt }]
       },
