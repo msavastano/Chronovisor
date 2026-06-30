@@ -25,3 +25,4 @@ dist-ssr
 
 # Generated diff file
 branch-diff.txt
+.vercel

@@ -191,7 +191,7 @@ export const executeTimeTravel = async (
 
   try {
     const imageResponse = await imageAi.models.generateContent({
-      model: 'gemini-3.1-flash-lite-image',
+      model: 'gemini-3.1-flash-lite',
       contents: {
         parts: [{ text: finalImagePrompt }]
       },

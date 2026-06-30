@@ -5,7 +5,8 @@
       "mcp__Claude_Preview__preview_start",
       "Bash(ls \"/c/Users/millh/Local Documents/dev/Chronovisor/node_modules/.bin/vite\"*)",
       "Bash(ls -la \"/c/Users/millh/Local Documents/dev/Chronovisor/.env\"*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(vercel whoami *)"
     ]
   }
 }
