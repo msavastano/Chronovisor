@@ -47,7 +47,7 @@ export const lookupHistoricalEvent = async (query: string, useMock: boolean = fa
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3.1-flash-lite',
+      model: 'gemini-3.5-flash-lite',
       contents: userPrompt,
       config: {
         systemInstruction: systemInstruction,
@@ -148,7 +148,7 @@ export const executeTimeTravel = async (
   `;
 
   const textResponse = await ai.models.generateContent({
-    model: 'gemini-3.1-flash-lite',
+    model: 'gemini-3.5-flash-lite',
     contents: userPrompt,
     config: {
       systemInstruction: systemInstruction,
@@ -191,7 +191,7 @@ export const executeTimeTravel = async (
 
   try {
     const imageResponse = await imageAi.models.generateContent({
-      model: 'gemini-3.1-flash-lite-image',
+      model: 'gemini-3.5-flash-lite-image',
       contents: {
         parts: [{ text: finalImagePrompt }]
       },

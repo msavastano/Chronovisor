@@ -6,7 +6,14 @@
       "Bash(ls \"/c/Users/millh/Local Documents/dev/Chronovisor/node_modules/.bin/vite\"*)",
       "Bash(ls -la \"/c/Users/millh/Local Documents/dev/Chronovisor/.env\"*)",
       "Bash(npx tsc:*)",
-      "Bash(vercel whoami *)"
+      "Bash(vercel whoami *)",
+      "mcp__plugin_vercel_vercel__list_teams",
+      "mcp__plugin_vercel_vercel__list_projects",
+      "mcp__plugin_vercel_vercel__get_project",
+      "mcp__plugin_vercel_vercel__search_vercel_documentation",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "mcp__plugin_vercel_vercel__list_deployments"
     ]
   }
 }
