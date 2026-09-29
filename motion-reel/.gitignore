@@ -1,0 +1,12 @@
+node_modules/
+.cache/
+# regenerable audio (tools/music.py, tools/sfx.mjs)
+music.wav
+sfx.wav
+# renders: keep only the deliverables
+out/*
+!out/final_9x16.mp4
+!out/final_1x1.mp4
+!out/final_16x9.mp4
+!out/contact.png
+!out/poster.png

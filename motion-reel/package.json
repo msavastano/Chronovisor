@@ -1,0 +1,23 @@
+{
+  "name": "chronovisor-reel",
+  "version": "1.0.0",
+  "description": "20 s Chronovisor product reel rendered from code",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
+  },
+  "scripts": {
+    "capture": "node tools/capture.mjs",
+    "music": "python3 tools/music.py",
+    "sfx": "node tools/sfx.mjs",
+    "draft": "node render.mjs --fps 30 --sub 1 --w 540 --h 960 --out out/draft.mp4",
+    "build": "bash tools/build.sh"
+  },
+  "devDependencies": {
+    "@fontsource/orbitron": "^5.3.0",
+    "@fontsource/share-tech-mono": "^5.3.0",
+    "playwright": "^1.56.1"
+  },
+  "type": "module",
+  "private": true
+}
